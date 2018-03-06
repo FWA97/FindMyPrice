@@ -1,12 +1,12 @@
 import {Component} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {EbayFindingService} from '../services/ebay.finding.service';
 
 @Component({
   selector: 'app-main',
   template: `
     <div>
       <input id="tbSearch" class="tbSearch" type="text" placeholder="Search for Article..." [(ngModel)]="inputSearch"/>
-      />
       <button id="btnSearch" class="btnSearch" (click)="load()">&#x2315;</button>
     </div>
     <div id="response"></div>
@@ -14,21 +14,19 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 })
 
 export class MainComponent {
-  http: HttpClient;
   title = 'main';
   inputSearch: string;
   highestPrice: ResultItem;
   lowestPrice: ResultItem;
   avgPrice: ResultItem;
 
-  constructor(http: HttpClient) {
-    this.http = http;
+  constructor(private ebayFindingService: EbayFindingService) {
   }
 
   load(): void {
     let url = 'http://svcs.ebay.de/services/search/FindingService/v1';
     let items = [];
-    let response = this.getJSON(url);
+    let response = this.ebayFindingService.getItemsByKeyords(this.inputSearch);
     if (response != null) {
        items = response.searchResult[0].item || [];
     }
@@ -37,27 +35,6 @@ export class MainComponent {
 
   }
 
-  getJSON(url: string) {
-    let result;
-    this.http.post(url, {
-      'operation-name': 'findItemsByKewords',
-      'service-version': '1.0.0',
-      'security-appname': 'AndreasM-Statisti-PRD-151ca6568-9ecacea6',
-      'global-id': 'ebay-de',
-      'response-data-format': 'json',
-      'keywords': encodeURI(this.inputSearch),
-      }, {
-      headers: new HttpHeaders({
-        'Access-Control-Allow-Origin': 'http://svcs.ebay.de',
-        'Vary': 'origin'    // keine Ahnung ob das so richtig ist
-      })
-    }).subscribe(item => result = JSON.parse(<string>item));
-    if (result != null) {
-      return result;
-    } else {
-      console.log('no result received');
-    }
-  }
 }
 
 

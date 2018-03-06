@@ -7,6 +7,7 @@ import {routing} from './app.routing';
 import {MainComponent} from './components/main.component';
 import {FormsModule} from '@angular/forms';
 import {HttpClientModule} from '@angular/common/http';
+import {EbayFindingService} from './services/ebay.finding.service';
 
 @NgModule({
   imports: [
@@ -20,7 +21,9 @@ import {HttpClientModule} from '@angular/common/http';
     NavComponent,
     MainComponent
   ],
-  providers: [],    // services go here
+  providers: [    // services go here
+    EbayFindingService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
