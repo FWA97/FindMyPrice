@@ -5,10 +5,14 @@ import {NavComponent} from './components/nav.component';
 import {AppComponent} from './app.component';
 import {routing} from './app.routing';
 import {MainComponent} from './components/main.component';
+import {FormsModule} from '@angular/forms';
+import {HttpClientModule} from '@angular/common/http';
 
 @NgModule({
   imports: [
     BrowserModule,
+    FormsModule,
+    HttpClientModule,
     routing
   ],
   declarations: [   // components and pipes go here
