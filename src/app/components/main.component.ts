@@ -1,5 +1,5 @@
 import {Component} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 
 @Component({
   selector: 'app-main',
@@ -26,18 +26,7 @@ export class MainComponent {
   }
 
   load(): void {
-    let url = 'http://svcs.ebay.com/services/search/FindingService/v1';
-    url += '?OPERATION-NAME=findItemsByKeywords';
-    url += '&SERVICE-VERSION=1.0.0';
-    url += '&SECURITY-APPNAME=AndreasM-Statisti-PRD-151ca6568-9ecacea6';
-    url += '&GLOBAL-ID=EBAY-US';
-    url += '&RESPONSE-DATA-FORMAT=JSON';
-    url += '&callback=getData';
-    url += '&REST-PAYLOAD';
-    url += '&keywords=' + encodeURI(this.inputSearch);
-    url += '&paginationInput.entriesPerPage=100';
-    url += '&paginationInput.pageNumber=1';
-
+    let url = 'http://svcs.ebay.de/services/search/FindingService/v1';
     let items = [];
     let response = this.getJSON(url);
     if (response != null) {
@@ -50,7 +39,19 @@ export class MainComponent {
 
   getJSON(url: string) {
     let result;
-    this.http.get(url).subscribe(item => result = JSON.parse(<string>item));
+    this.http.post(url, {
+      'operation-name': 'findItemsByKewords',
+      'service-version': '1.0.0',
+      'security-appname': 'AndreasM-Statisti-PRD-151ca6568-9ecacea6',
+      'global-id': 'ebay-de',
+      'response-data-format': 'json',
+      'keywords': encodeURI(this.inputSearch),
+      }, {
+      headers: new HttpHeaders({
+        'Access-Control-Allow-Origin': 'http://svcs.ebay.de',
+        'Vary': 'origin'    // keine Ahnung ob das so richtig ist
+      })
+    }).subscribe(item => result = JSON.parse(<string>item));
     if (result != null) {
       return result;
     } else {
