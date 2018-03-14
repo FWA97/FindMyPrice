@@ -1,5 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {ResultItem} from '../components/main.component';
+import {Observable} from 'rxjs/Observable';
 
 @Injectable()
 
@@ -12,25 +14,49 @@ export class EbayFindingService {
     this.http = httpClient;
   }
 
-  public getItemsByKeyords(input: string): any {
-    let result;
-    this.http.post(this.url, {
-      'operation-name': 'findItemsByKewords',
-      'service-version': '1.0.0',
-      'security-appname': 'AndreasM-Statisti-PRD-151ca6568-9ecacea6',
-      'global-id': 'ebay-de',
-      'response-data-format': 'json',
-      'keywords': encodeURI(input),
-    }, {
-      headers: new HttpHeaders({
-        'Access-Control-Allow-Origin': 'http://svcs.ebay.de',
-        'Vary': 'origin'    // keine Ahnung ob das so richtig ist
-      })
-    }).subscribe(item => result = JSON.parse(<string>item));
-    if (result != null) {
-      return result;
-    } else {
-      console.log('no result received');
-    }
+  public aCallbackFunction(input: any) {
+    console.log('aCallbackFunction was called');
   }
+
+  public getItemsByKeywords(input: string): Observable<EbayResponse> {   // requires same origin policy to be disabled
+    let callURL = this.url;
+    callURL += '?OPERATION-NAME=findItemsByKeywords';
+    callURL += '&SERVICE-VERSION=1.13.0';
+    callURL += '&GLOBAL-ID=EBAY-DE';
+    callURL += '&RESPONSE-DATA-FORMAT=JSON';
+    callURL += '&keywords=' + encodeURI(input);
+    callURL += '&paginationInput.entriesPerPage=100';
+    callURL += '&paginationInput.pageNumber=1';
+    return this.http.get<EbayResponse>(callURL);
+  }
+
+  // This could solve our problem: https://octoperf.com/blog/2016/04/03/angular2-typescript-callback-typing/
+  // the only remaining question is, wethter we can use an any type, or have to create some sort of itemType for the response
+
+  public getItemsByKeyords(input: string, callback: (data: any) => void) {   // does not work
+    console.log('get items by keyword was called');
+    console.log(callback);
+    let callURL = this.url;
+    callURL += '?OPERATION-NAME=findItemsByKeywords';
+    callURL += '&SERVICE-VERSION=1.13.0';
+    callURL += '&SECURITY-APPNAME=AndreasM-Statisti-PRD-151ca6568-9ecacea6';
+    callURL += '&GLOBAL-ID=EBAY-DE';
+    callURL += '&RESPONSE-DATA-FORMAT=JSON';
+    callURL += '&callback=' + callback;
+    callURL += '&REST-PAYLOAD';
+    callURL += '&keywords=' + encodeURI(input);
+    callURL += '&paginationInput.entriesPerPage=100';
+    callURL += '&paginationInput.pageNumber=1';
+
+    document.createElement('script').setAttribute('src', callURL);
+  }
+
+}
+
+export interface EbayResponse {
+  data: SearchResult[];
+}
+
+export interface SearchResult {
+  searchResult: any[];
 }

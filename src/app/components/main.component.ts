@@ -1,6 +1,6 @@
 import {Component} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {EbayFindingService} from '../services/ebay.finding.service';
+import {EbayFindingService, EbayResponse} from '../services/ebay.finding.service';
 
 @Component({
   selector: 'app-main',
@@ -25,20 +25,24 @@ export class MainComponent {
 
   load(): void {
     let url = 'http://svcs.ebay.de/services/search/FindingService/v1';
-    let items = [];
-    let response = this.ebayFindingService.getItemsByKeyords(this.inputSearch);
-    if (response != null) {
-       items = response.searchResult[0].item || [];
-    }
 
-    console.log(items);
+    this.ebayFindingService.getItemsByKeywords(this.inputSearch).subscribe((data) => {
+      console.log(<EbayResponse>data);
+      //console.log((<EbayResponse>data)[0].searchResult);
+      //console.log(data[0].searchResult[0].count);
+    });
 
+  }
+
+  public handleData(data: any): ResultItem[] {
+    console.log('calback function was called');
+    return null;
   }
 
 }
 
 
-class ResultItem {
+export class ResultItem {
   type: string;
   name: string;
   price: number;
