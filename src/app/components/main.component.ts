@@ -1,24 +1,19 @@
 import {Component} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {EbayFindingService, EbayResponse} from '../services/ebay.finding.service';
+import {EbayFindingService} from '../services/ebay.finding.service';
+import {forEach} from '@angular/router/src/utils/collection';
 
 @Component({
   selector: 'app-main',
-  template: `
-    <div>
-      <input id="tbSearch" class="tbSearch" type="text" placeholder="Search for Article..." [(ngModel)]="inputSearch"/>
-      <button id="btnSearch" class="btnSearch" (click)="load()">&#x2315;</button>
-    </div>
-    <div id="response"></div>
-  `
+  templateUrl: './main.component.html'
 })
 
 export class MainComponent {
-  title = 'main';
+  gotResult: boolean;
   inputSearch: string;
   highestPrice: ResultItem;
   lowestPrice: ResultItem;
-  avgPrice: ResultItem;
+  avgPrice: number;
 
   constructor(private ebayFindingService: EbayFindingService) {
   }
@@ -27,9 +22,44 @@ export class MainComponent {
     let url = 'http://svcs.ebay.de/services/search/FindingService/v1';
 
     this.ebayFindingService.getItemsByKeywords(this.inputSearch).subscribe((data) => {
-      console.log(<EbayResponse>data);
-      //console.log((<EbayResponse>data)[0].searchResult);
-      //console.log(data[0].searchResult[0].count);
+      console.log(data);
+      let ack = data.findItemsByKeywordsResponse[0].ack;
+      console.log(ack);
+      if (ack.includes('Success')) {
+        let items = data.findItemsByKeywordsResponse[0].searchResult[0].item || [];
+        console.log(items);
+        if (items.length > 0) {
+          let sumPrices = 0;
+          let countedPrices = 0;
+          this.lowestPrice = new ResultItem(items[0].title[0], parseFloat(items[0].sellingStatus[0].convertedCurrentPrice[0].__value__), items[0].galleryURL[0]);
+          this.highestPrice = new ResultItem(items[0].title[0], parseFloat(items[0].sellingStatus[0].convertedCurrentPrice[0].__value__), items[0].galleryURL[0]);
+
+          this.gotResult = true;
+          for (let i = 0; i < items.length; i++) {
+            if (!items[i].listingInfo[0].listingType[0].includes('Auction')) {
+              let price = parseFloat(items[i].sellingStatus[0].convertedCurrentPrice[0].__value__);
+              sumPrices += price;
+              countedPrices++;
+              if (price < this.lowestPrice.price) {
+                this.lowestPrice.price = price;
+                this.lowestPrice.name = items[i].title[0];
+                this.lowestPrice.imgSource = items[i].galleryURL[0];
+                console.log('lowest price: ' + i);
+              }
+              if (price > this.highestPrice.price) {
+                this.highestPrice.price = price;
+                this.highestPrice.name = items[i].title[0];
+                this.highestPrice.imgSource = items[i].galleryURL[0];
+                console.log('highest price: ' + i);
+              }
+            }
+          }
+
+          this.avgPrice = Math.round(sumPrices / countedPrices);
+
+        }
+      }
+
     });
 
   }
@@ -43,14 +73,57 @@ export class MainComponent {
 
 
 export class ResultItem {
-  type: string;
   name: string;
   price: number;
   imgSource: string;
 
-  constructor(type: string, price: number) {
-    this.type = type;
+  constructor(name: string, price: number, imgUrl: string) {
+    this.name = name;
     this.price = price;
+    this.imgSource = imgUrl;
   }
 
 }
+
+export interface Data {
+  findItemsByKeywordsResponse: FindItemsByKeywordsResponse[];
+}
+
+export interface FindItemsByKeywordsResponse {
+  searchResult: SearchResult[];
+  ack: string[];
+  paginationOutput: PaginationOutput[];
+}
+
+export interface SearchResult {
+  item: Item[];
+}
+
+export interface Item {
+  itemId: string[];
+  title: string[];
+  galleryURL: string[];
+  viewItemURL: string[];
+  sellingStatus: SellingStatus[];
+  listingInfo: ListingInfo[];
+}
+
+export interface SellingStatus {
+  convertedCurrentPrice: Price[];
+}
+
+interface Price {
+  __value__: string;
+}
+
+export interface ListingInfo {
+  listingType: string[];
+}
+
+export interface PaginationOutput {
+  pageNumber: string[];
+  entriesPerPage: string[];
+  totalPages: string[];
+  totalEntries: string[];
+}
+

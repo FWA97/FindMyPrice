@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {ResultItem} from '../components/main.component';
+import {Data, ResultItem} from '../components/main.component';
 import {Observable} from 'rxjs/Observable';
 
 @Injectable()
@@ -18,7 +18,7 @@ export class EbayFindingService {
     console.log('aCallbackFunction was called');
   }
 
-  public getItemsByKeywords(input: string): Observable<EbayResponse> {   // requires same origin policy to be disabled
+  public getItemsByKeywords(input: string): Observable<Data> {   // requires same origin policy to be disabled
     let callURL = this.url;
     callURL += '?OPERATION-NAME=findItemsByKeywords';
     callURL += '&SERVICE-VERSION=1.13.0';
@@ -27,7 +27,10 @@ export class EbayFindingService {
     callURL += '&keywords=' + encodeURI(input);
     callURL += '&paginationInput.entriesPerPage=100';
     callURL += '&paginationInput.pageNumber=1';
-    return this.http.get<EbayResponse>(callURL);
+    return this.http.get<Data>(callURL, {
+      observe: 'body',
+      responseType: 'json'
+    });
   }
 
   // This could solve our problem: https://octoperf.com/blog/2016/04/03/angular2-typescript-callback-typing/
@@ -51,12 +54,4 @@ export class EbayFindingService {
     document.createElement('script').setAttribute('src', callURL);
   }
 
-}
-
-export interface EbayResponse {
-  data: SearchResult[];
-}
-
-export interface SearchResult {
-  searchResult: any[];
 }
