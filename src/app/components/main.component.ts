@@ -18,6 +18,7 @@ export class MainComponent {
   constructor(private ebayFindingService: EbayFindingService) {
   }
 
+
   load(): void {
     let url = 'http://svcs.ebay.de/services/search/FindingService/v1';
 

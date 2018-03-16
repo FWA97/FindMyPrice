@@ -9,6 +9,7 @@ import {FormsModule} from '@angular/forms';
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {EbayFindingService} from './services/ebay.finding.service';
 import {EbayInterceptor} from './services/ebay.interceptor';
+import {AboutComponent} from './components/about.component';
 
 @NgModule({
   imports: [
@@ -20,7 +21,8 @@ import {EbayInterceptor} from './services/ebay.interceptor';
   declarations: [   // components and pipes go here
     AppComponent,
     NavComponent,
-    MainComponent
+    MainComponent,
+    AboutComponent
   ],
   providers: [    // services go here
     {provide: HTTP_INTERCEPTORS, useClass: EbayInterceptor, multi: true},
