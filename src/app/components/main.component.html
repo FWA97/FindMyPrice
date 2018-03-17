@@ -1,31 +1,28 @@
 <div>
-  <input id="tbSearch" class="tbSearch" type="text" placeholder="Search for Article..." [(ngModel)]="inputSearch"/>
+  <input id="tbSearch" class="tbSearch" type="text" placeholder="Search for Article..." (keydown)="keyDown($event)" [(ngModel)]="inputSearch"/>
   <button id="btnSearch" class="btnSearch" (click)="load()">&#x2315;</button>
 </div>
 <div id="response" *ngIf="gotResult">
+  <h3>average price: {{avgPrice}} €</h3>
   <table>
     <tr>
       <th></th>
       <th>lowest Price</th>
-      <th>average Price</th>
       <th>highest Price</th>
     </tr>
     <tr>
       <td>Product</td>
       <td>{{lowestPrice.name}}</td>
-      <td></td>
       <td>{{highestPrice.name}}</td>
     </tr>
     <tr>
       <td>Price</td>
       <td>{{lowestPrice.price}} €</td>
-      <td>{{avgPrice}} €</td>
       <td>{{highestPrice.price}} €</td>
     </tr>
     <tr>
       <td>Image</td>
       <td><img [src]="lowestPrice.imgSource" [alt]="'image lowest'"> </td>
-      <td></td>
       <td><img [src]="highestPrice.imgSource" [alt]="'image highest'"></td>
     </tr>
   </table>

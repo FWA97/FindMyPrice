@@ -1,7 +1,5 @@
 import {Component} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {EbayFindingService} from '../services/ebay.finding.service';
-import {forEach} from '@angular/router/src/utils/collection';
 
 @Component({
   selector: 'app-main',
@@ -18,9 +16,13 @@ export class MainComponent {
   constructor(private ebayFindingService: EbayFindingService) {
   }
 
+  keyDown(event: KeyboardEvent) {
+    if (event.keyCode === 13) {
+      this.load();
+    }
+  }
 
   load(): void {
-    let url = 'http://svcs.ebay.de/services/search/FindingService/v1';
 
     this.ebayFindingService.getItemsByKeywords(this.inputSearch).subscribe((data) => {
       console.log(data);
