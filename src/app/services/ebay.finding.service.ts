@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Data, ResultItem} from '../components/main.component';
 import {Observable} from 'rxjs/Observable';
 
 @Injectable()
@@ -55,3 +54,46 @@ export class EbayFindingService {
   }
 
 }
+
+export interface Data {
+  findItemsByKeywordsResponse: FindItemsByKeywordsResponse[];
+}
+
+export interface FindItemsByKeywordsResponse {
+  searchResult: SearchResult[];
+  ack: string[];
+  paginationOutput: PaginationOutput[];
+}
+
+export interface SearchResult {
+  item: Item[];
+}
+
+export interface Item {
+  itemId: string[];
+  title: string[];
+  galleryURL: string[];
+  viewItemURL: string[];
+  sellingStatus: SellingStatus[];
+  listingInfo: ListingInfo[];
+}
+
+export interface SellingStatus {
+  convertedCurrentPrice: Price[];
+}
+
+interface Price {
+  __value__: string;
+}
+
+export interface ListingInfo {
+  listingType: string[];
+}
+
+export interface PaginationOutput {
+  pageNumber: string[];
+  entriesPerPage: string[];
+  totalPages: string[];
+  totalEntries: string[];
+}
+

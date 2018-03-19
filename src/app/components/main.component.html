@@ -2,8 +2,9 @@
   <input id="tbSearch" class="tbSearch" type="text" placeholder="Search for Article..." (keydown)="keyDown($event)" [(ngModel)]="inputSearch"/>
   <button id="btnSearch" class="btnSearch" (click)="load()">&#x2315;</button>
 </div>
+<div class="loader" *ngIf="loading"></div>
 <div id="response" *ngIf="gotResult">
-  <h3>average price: {{avgPrice}} €</h3>
+  <h2>average price: {{avgPrice}} €</h2>
   <table>
     <tr>
       <th></th>
@@ -27,3 +28,4 @@
     </tr>
   </table>
 </div>
+<div *ngIf="noResult">unable to find any results</div>

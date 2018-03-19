@@ -7,7 +7,9 @@ import {EbayFindingService} from '../services/ebay.finding.service';
 })
 
 export class MainComponent {
+  loading: boolean;
   gotResult: boolean;
+  noResult: boolean;
   inputSearch: string;
   highestPrice: ResultItem;
   lowestPrice: ResultItem;
@@ -24,6 +26,10 @@ export class MainComponent {
 
   load(): void {
 
+    this.noResult = false;
+    this.gotResult = false;
+    this.loading = true;
+
     this.ebayFindingService.getItemsByKeywords(this.inputSearch).subscribe((data) => {
       console.log(data);
       let ack = data.findItemsByKeywordsResponse[0].ack;
@@ -37,6 +43,7 @@ export class MainComponent {
           this.lowestPrice = new ResultItem(items[0].title[0], parseFloat(items[0].sellingStatus[0].convertedCurrentPrice[0].__value__), items[0].galleryURL[0]);
           this.highestPrice = new ResultItem(items[0].title[0], parseFloat(items[0].sellingStatus[0].convertedCurrentPrice[0].__value__), items[0].galleryURL[0]);
 
+          this.loading = false;
           this.gotResult = true;
           for (let i = 0; i < items.length; i++) {
             if (!items[i].listingInfo[0].listingType[0].includes('Auction')) {
@@ -60,16 +67,17 @@ export class MainComponent {
 
           this.avgPrice = Math.round(sumPrices / countedPrices);
 
+        } else {
+          this.loading = false;
+          this.noResult = true;
         }
+      } else {
+        this.loading = false;
+        this.noResult = true;
       }
 
     });
 
-  }
-
-  public handleData(data: any): ResultItem[] {
-    console.log('calback function was called');
-    return null;
   }
 
 }
@@ -86,47 +94,5 @@ export class ResultItem {
     this.imgSource = imgUrl;
   }
 
-}
-
-export interface Data {
-  findItemsByKeywordsResponse: FindItemsByKeywordsResponse[];
-}
-
-export interface FindItemsByKeywordsResponse {
-  searchResult: SearchResult[];
-  ack: string[];
-  paginationOutput: PaginationOutput[];
-}
-
-export interface SearchResult {
-  item: Item[];
-}
-
-export interface Item {
-  itemId: string[];
-  title: string[];
-  galleryURL: string[];
-  viewItemURL: string[];
-  sellingStatus: SellingStatus[];
-  listingInfo: ListingInfo[];
-}
-
-export interface SellingStatus {
-  convertedCurrentPrice: Price[];
-}
-
-interface Price {
-  __value__: string;
-}
-
-export interface ListingInfo {
-  listingType: string[];
-}
-
-export interface PaginationOutput {
-  pageNumber: string[];
-  entriesPerPage: string[];
-  totalPages: string[];
-  totalEntries: string[];
 }
 

@@ -14,7 +14,7 @@ table {
 td{
   background: rgba(250, 250, 250, 0.5);
   padding: 10px;
-  margin: 0px;
+  margin: 0;
   border: black;
   border-style: solid;
 }
@@ -90,8 +90,8 @@ td{
 /* Search text box */
 .tbSearch{
 
-  width: 400px;
-  padding-right: 50px;
+  width: 450px;
+  padding-right: 75px;
   -webkit-box-sizing: content-box;
   -moz-box-sizing: content-box;
   box-sizing: content-box;
